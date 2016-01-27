@@ -1,0 +1,19 @@
+{
+  "name": "react-native-sso-authentication",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Lussa Teknologi",
+  "license": "ISC",
+  "description": "a native sso authentication for react native",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lussatech/react-native-sso-authentication.git"
+  },
+  "bugs": {
+    "url": "https://github.com/lussatech/react-native-sso-authentication/issues"
+  },
+  "homepage": "https://github.com/lussatech/react-native-sso-authentication"
+}
