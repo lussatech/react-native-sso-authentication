@@ -15,7 +15,7 @@
 <a name="step1"></a>
 ### Step 1: Get the code
 
-    npm install react-native-sso-authentication --save
+    npm install react-native-sso-authentication
 
 -----
 <a name="step2"></a>
@@ -44,7 +44,7 @@
     #index.android.js
 
     ...
-    import Example from './lib/react-native-sso-authentication';
+    import Example from './lib/react-native-sso-authentication/Example';
     ...
 
     class Name extends React.Component {
