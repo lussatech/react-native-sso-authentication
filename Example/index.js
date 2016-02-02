@@ -13,8 +13,8 @@ import React, {
   BackAndroid
 } from 'react-native';
 
-import Facebook from './Facebook';
-import Google from './Google';
+import Facebook from '../Facebook';
+import Google from '../Google';
 
 const style = StyleSheet.create({
   container: {
@@ -78,13 +78,6 @@ class Home extends Component {
         </View>
       </ScrollView>
     );
-  }
-
-  onActionSelected(position) {
-    if (actions[position].route) {
-      return this.gotoRoute(actions[position].route);
-    }
-    return ToastAndroid.show(actions[position].title, ToastAndroid.SHORT);
   }
 
   gotoRoute(name) {

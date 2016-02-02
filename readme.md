@@ -7,9 +7,6 @@
 * [Step 1: Get the code](#step1)
 * [Step 2: Generate files](#step2)
 * [Step 3: Customize files](#step3)
-* [Step 4: View an example](#step4)
-* [Step 5: Start server](#step5)
-* [Step 6: Run on device](#step6)
 
 -----
 <a name="step1"></a>
@@ -28,45 +25,68 @@
 ### Step 3: Customize files
 
     react-native-project
-    |_ ...
+    ...
     |_ lib
       |_ react-native-sso-authentication
-        |_ Example.js
+        |_ Example
         |_ ...
         |_ Facebook.js
         |_ ...
-        |_ Style.js
-
------
-<a name="step4"></a>
-### Step 4: View an example
-
-    #index.android.js
-
-    ...
-    import Example from './lib/react-native-sso-authentication/Example';
+        |_ Server.js
     ...
 
-    class Name extends React.Component {
-      ...
-      render() {
-        return (
-          ...
-          <Example />
-          ...
-        );
-      }
-      ...
-    }
+#### Setting up your oauth credentials at `Server.js`
+```javascript
+# lib/react-native-sso-authentication/Server.js
 
------
-<a name="step5"></a>
-### Step 5: Start server
+...
+export const facebook = {
+      client_id: '', // The id of your facebook app (Facebook App ID)
+  client_secret: '', // The secret of your facebook app (Facebook App Secret)
+   oauth_dialog: '', // The uri to display facebook login dialog
+   redirect_uri: '', // The uri to capture response (code) from login dialog
+    oauth_token: '', // The uri to exchange response (code) for an accessing token (short-lived-token)
+   oauth_access: '', // The uri to exchange short-lived-token for long-lived-token
+  oauth_profile: '', // The uri to get logged in user profile
+};
 
-    react-native start
+export const google = {
+      client_id: '', // The id of your google app (Google App ID)
+  client_secret: '', // The secret of your google app (Google App Secret)
+   oauth_dialog: '', // The uri to display google login dialog
+   redirect_uri: '', // The uri to capture response (code) from login dialog
+    oauth_token: '', // The uri to exchange response (code) for an accessing token
+  oauth_profile: '', // The uri to get logged in user profile
+};
+...
+```
 
------
-<a name="step6"></a>
-### Step 6: Run on device
+#### Import `Facebook.js` and or `Google.js` to your _react-native-project_, e.g.
+```javascript
+# index.android.js
 
-    react-native run-android
+...
+import Facebook from './lib/react-native-sso-authentication/Facebook';
+
+class Name extends Component {
+  render() {
+    return <Facebook />;
+  }
+}
+...
+```
+
+#### Or import `Example` to your _react-native-project_ to see an example, e.g.
+```javascript
+# index.android.js
+
+...
+import Example from './lib/react-native-sso-authentication/Example';
+
+class Name extends Component {
+  render() {
+    return <Example />;
+  }
+}
+...
+```

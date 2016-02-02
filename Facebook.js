@@ -13,6 +13,24 @@ import api, {
   facebook
 } from './Server';
 
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  welcome: {
+    fontSize: 20,
+    textAlign: 'center',
+    margin: 10,
+  },
+  instructions: {
+    textAlign: 'center',
+    color: '#333333',
+    marginBottom: 5,
+  },
+});
+
 export default class extends Component {
   constructor(props) {
     super(props);
@@ -27,9 +45,9 @@ export default class extends Component {
 
   render() {
     if (this.state.response) return this.renderResponse();
-    if (this.state.access) return this.renderAccess();
-    if (this.state.token) return this.renderToken();
-    if (this.state.code) return this.renderCode();
+    if (this.state.access) return this.fetchProfile();
+    if (this.state.token) return this.fetchAccess();
+    if (this.state.code) return this.fetchToken();
 
     return this.renderScene();
   }
@@ -48,10 +66,10 @@ export default class extends Component {
     );
   }
 
-  renderCode() {
+  fetchToken() {
     if (this.state.token) return null;
 
-    api.facebook.code(this.state.code)
+    api.facebook.token(this.state.code)
       .then((response) => {
         if (!response.ok) throw Error(response.statusText || response._bodyText);
         return response.json()
@@ -72,10 +90,10 @@ export default class extends Component {
     return null;
   }
 
-  renderToken() {
+  fetchAccess() {
     if (this.state.access) return null;
 
-    api.facebook.token(this.state.token)
+    api.facebook.access(this.state.token)
       .then((response) => {
         if ((/access_token=/g).test(response._bodyText)) {
           this.setState({
@@ -92,7 +110,7 @@ export default class extends Component {
     return null;
   }
 
-  renderAccess() {
+  fetchProfile() {
     if (this.state.response) return null;
 
     api.facebook.profile(this.state.access)
@@ -130,22 +148,3 @@ export default class extends Component {
     }
   }
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#F5FCFF',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});

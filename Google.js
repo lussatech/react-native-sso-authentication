@@ -1,10 +1,5 @@
-/**
- * Sample React Native App
- * https://github.com/facebook/react-native
- * https://accounts.google.com/o/oauth2/auth?response_type=code&redirect_uri=http%3A%2F%2Fbeta.tarsius.co%2Fauth%2Fgoogle%2Fcallback&scope=profile%20email&state=eyJzdG9yZSI6IjU2OWNiMzVkYmM0ZTg3YzUzOTAyNjViNSIsImNsaWVudF9vcmlnaW4iOiJodHRwOi8vYmV0YS5Qb3J0ZWVnb29kcy5jb20ifQ%3D%3D&client_id=61885164992-63coq8slb4qnkec5v6vo2s2ltvu67jkd.apps.googleusercontent.com
- * http://beta.tarsius.co/auth/google/callback?state=eyJzdG9yZSI6IjU2OWNiMzVkYmM0ZTg3YzUzOTAyNjViNSIsImNsaWVudF9vcmlnaW4iOiJodHRwOi8vYmV0YS5Qb3J0ZWVnb29kcy5jb20ifQ%3D%3D&code=4/EEmAG90obMa404Sw8fKqItyFIktUjhJG6LFbs4DCtj4#
- */
 'use strict';
+
 import React, {
   Component,
   StyleSheet,
@@ -31,8 +26,8 @@ export default class extends Component {
 
   render() {
     if (this.state.response) return this.renderResponse();
-    if (this.state.token) return this.renderToken();
-    if (this.state.code) return this.renderCode();
+    if (this.state.token) return this.fetchProfile();
+    if (this.state.code) return this.fetchToken();
 
     return this.renderScene();
   }
@@ -51,10 +46,10 @@ export default class extends Component {
     );
   }
 
-  renderCode() {
+  fetchToken() {
     if (this.state.token) return null;
 
-    api.google.code(this.state.code)
+    api.google.token(this.state.code)
       .then((response) => {
         if (!response.ok) throw Error(response.statusText || response._bodyText);
         return response.json()
@@ -75,7 +70,7 @@ export default class extends Component {
     return null;
   }
 
-  renderToken() {
+  fetchProfile() {
     if (this.state.response) return null;
 
     api.google.profile(this.state.token)
@@ -120,7 +115,6 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#F5FCFF',
   },
   welcome: {
     fontSize: 20,
