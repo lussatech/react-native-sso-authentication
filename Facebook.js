@@ -6,40 +6,25 @@ import React, {
   Text,
   View,
   WebView,
-  ToastAndroid
+  ToastAndroid,
+  AsyncStorage,
+  Image,
+  TouchableHighlight
 } from 'react-native';
 
-import api, {
-  facebook
-} from './Server';
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+import api, {key, facebook} from './Server';
+import stylesheet from './Style';
 
 export default class extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      code: undefined,
-      token: undefined,
-      access: undefined,
-      response: undefined
+          code: undefined,
+         token: undefined,
+        access: undefined,
+      response: undefined,
+       loading: false,
     };
   }
 
@@ -54,14 +39,26 @@ export default class extends Component {
 
   renderScene() {
     return (
-      <View style={{flex:1}}>
-        <WebView
-          url={([facebook.oauth_dialog,'?client_id=',facebook.client_id,'&redirect_uri=',facebook.redirect_uri]).join('')}
-          javaScriptEnabledAndroid={true}
-          automaticallyAdjustContentInsets={false}
-          scalesPageToFit={true}
-          onNavigationStateChange={this.onNavigationStateChange.bind(this)}
-        />
+      <WebView
+        url={([facebook.oauth_dialog,'?client_id=',facebook.client_id,'&redirect_uri=',facebook.redirect_uri]).join('')}
+        javaScriptEnabledAndroid={true}
+        automaticallyAdjustContentInsets={false}
+        scalesPageToFit={true}
+        onNavigationStateChange={this.onNavigationStateChange.bind(this)}
+      />
+    );
+  }
+
+  renderResponse() {
+    let profile = JSON.parse(this.state.response);
+
+    return (
+      <View style={styles.container}>
+        <Image style={styles.image} source={{uri: profile.picture.data.url}} />
+        <Text style={styles.welcome}>{profile.name}</Text>
+        <TouchableHighlight style={[styles.button, (this.state.loading ? styles.buttonDisabled : styles.buttonActive)]} underlayColor={stylesheet.buttonDisabled.backgroundColor} onPress={() => this.onLogout()}>
+          <Text style={styles.buttonText}>{this.state.loading ? 'Please Wait . . .' : 'Logout'}</Text>
+        </TouchableHighlight>
       </View>
     );
   }
@@ -122,6 +119,7 @@ export default class extends Component {
         this.setState({
           response: JSON.stringify(responseData)
         });
+        this.saveResponse().done();
       })
       .catch((error) => {
         console.log(error);
@@ -132,14 +130,6 @@ export default class extends Component {
     return null;
   }
 
-  renderResponse() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.instructions}>{this.state.response}</Text>
-      </View>
-    );
-  }
-
   onNavigationStateChange(navState) {
     if ((/code=/g).test(String(navState.url))) {
       this.setState({
@@ -147,4 +137,58 @@ export default class extends Component {
       });
     }
   }
+
+  onLogout() {
+    if (this.state.loading) {
+      ToastAndroid.show('Please Wait . . .', ToastAndroid.SHORT);
+      return null;
+    }
+
+    this.setState({loading: true});
+
+    api.facebook.logout(this.state.access)
+      .then((response) => {
+        console.log(response);
+        if (!response.ok) throw Error(response.statusText || response._bodyText);
+
+        this.setState({
+              code: undefined,
+             token: undefined,
+            access: undefined,
+          response: undefined
+        });
+
+        this.removeResponse().done();
+      })
+      .catch((error) => {
+        console.log(error);
+        ToastAndroid.show(String(error).replace('Error: ',''), ToastAndroid.LONG);
+      })
+      .done(() => {
+        this.setState({
+           loading: false
+        });
+      });
+
+    return null;
+  }
+
+  async saveResponse() {
+    try {
+      await AsyncStorage.setItem(key.facebook, JSON.stringify(this.state.response));
+    } catch (error) {
+      ToastAndroid.show(String(error).replace('Error: ',''), ToastAndroid.LONG);
+    }
+  }
+
+  async removeResponse() {
+    try {
+      await AsyncStorage.removeItem(key.facebook);
+      ToastAndroid.show('Logout successfully!', ToastAndroid.SHORT);
+    } catch (error) {
+      ToastAndroid.show(String(error).replace('Error: ',''), ToastAndroid.LONG);
+    }
+  }
 }
+
+const styles = StyleSheet.create(stylesheet);

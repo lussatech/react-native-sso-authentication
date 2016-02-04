@@ -6,21 +6,24 @@ import React, {
   Text,
   View,
   WebView,
-  ToastAndroid
+  ToastAndroid,
+  TouchableHighlight,
+  Image,
+  AsyncStorage
 } from 'react-native';
 
-import api, {
-  google
-} from './Server';
+import api, {key, google} from './Server';
+import stylesheet from './Style';
 
 export default class extends Component {
   constructor(props) {
     super(props);
 
     this.state = {
-      code: undefined,
-      token: undefined,
-      response: undefined
+          code: undefined,
+         token: undefined,
+      response: undefined,
+       loading: false
     };
   }
 
@@ -34,14 +37,26 @@ export default class extends Component {
 
   renderScene() {
     return (
-      <View style={{flex:1}}>
-        <WebView
-          url={([google.oauth_dialog,'?scope=email profile&redirect_uri=',google.redirect_uri,'&response_type=code&client_id=',google.client_id]).join('')}
-          javaScriptEnabledAndroid={true}
-          automaticallyAdjustContentInsets={false}
-          scalesPageToFit={true}
-          onNavigationStateChange={this.onNavigationStateChange.bind(this)}
-        />
+      <WebView
+        url={([google.oauth_dialog,'?scope=email profile&redirect_uri=',google.redirect_uri,'&response_type=code&client_id=',google.client_id]).join('')}
+        javaScriptEnabledAndroid={true}
+        automaticallyAdjustContentInsets={false}
+        scalesPageToFit={true}
+        onNavigationStateChange={this.onNavigationStateChange.bind(this)}
+      />
+    );
+  }
+
+  renderResponse() {
+    let profile = JSON.parse(this.state.response);
+
+    return (
+      <View style={styles.container}>
+        <Image style={styles.image} source={{uri: profile.picture}} />
+        <Text style={styles.welcome}>{profile.name}</Text>
+        <TouchableHighlight style={[styles.button, (this.state.loading ? styles.buttonDisabled : styles.buttonActive)]} underlayColor={stylesheet.buttonDisabled.backgroundColor} onPress={() => this.onLogout()}>
+          <Text style={styles.buttonText}>{this.state.loading ? 'Please Wait . . .' : 'Logout'}</Text>
+        </TouchableHighlight>
       </View>
     );
   }
@@ -83,6 +98,7 @@ export default class extends Component {
         this.setState({
           response: JSON.stringify(responseData)
         });
+        this.saveResponse().done();
       })
       .catch((error) => {
         console.log(error);
@@ -93,14 +109,6 @@ export default class extends Component {
     return null;
   }
 
-  renderResponse() {
-    return (
-      <View style={styles.container}>
-        <Text style={styles.instructions}>{this.state.response}</Text>
-      </View>
-    );
-  }
-
   onNavigationStateChange(navState) {
     if ((/code=/g).test(String(navState.url))) {
       this.setState({
@@ -108,22 +116,55 @@ export default class extends Component {
       });
     }
   }
+
+  onLogout() {
+    if (this.state.loading) {
+      ToastAndroid.show('Please Wait . . .', ToastAndroid.SHORT);
+      return null;
+    }
+
+    this.setState({loading: true});
+
+    api.google.logout(this.state.token)
+      .then((response) => {
+        console.log(response);
+        if (!response.ok) throw Error(response.statusText || response._bodyText);
+
+        this.setState({
+          code: undefined,
+          token: undefined,
+          response: undefined
+        });
+
+        this.removeResponse().done();
+      })
+      .catch((error) => {
+        console.log(error);
+        ToastAndroid.show(String(error).replace('Error: ',''), ToastAndroid.LONG);
+      })
+      .done(() => {
+        this.setState({loading: false});
+      });
+
+    return null;
+  }
+
+  async saveResponse() {
+    try {
+      await AsyncStorage.setItem(key.google, JSON.stringify(this.state.response));
+    } catch (error) {
+      ToastAndroid.show(String(error).replace('Error: ',''), ToastAndroid.LONG);
+    }
+  }
+
+  async removeResponse() {
+    try {
+      await AsyncStorage.removeItem(key.google);
+      ToastAndroid.show('Logout successfully!', ToastAndroid.SHORT);
+    } catch (error) {
+      ToastAndroid.show(String(error).replace('Error: ',''), ToastAndroid.LONG);
+    }
+  }
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  welcome: {
-    fontSize: 20,
-    textAlign: 'center',
-    margin: 10,
-  },
-  instructions: {
-    textAlign: 'center',
-    color: '#333333',
-    marginBottom: 5,
-  },
-});
+const styles = StyleSheet.create(stylesheet);
