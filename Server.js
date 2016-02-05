@@ -1,9 +1,6 @@
 'use strict';
 
-export const key = {
-  facebook: '@lussatech:facebook',
-     googe: '@lussatech:google',
-};
+export const key = '@lussatech:session';
 
 export const facebook = {
       client_id: '1505435769762540',
@@ -29,7 +26,7 @@ export const google = {
 export default {
   facebook: {
     token: function (code) {
-      let url = ([facebook.oauth_token,'?client_id=',facebook.client_id,'&client_secret=',facebook.client_secret,'&redirect_uri=',facebook.redirect_uri,'&code=',code]).join(''),
+      let url = `${facebook.oauth_token}?client_id=${facebook.client_id}&client_secret=${facebook.client_secret}&redirect_uri=${facebook.redirect_uri}&code=${code}`,
           opt = {
             method: 'get'
           };
@@ -37,7 +34,7 @@ export default {
       return fetch(url, opt);
     },
     access: function (token) {
-      let url = ([facebook.oauth_access,'?grant_type=fb_exchange_token&client_id=',facebook.client_id,'&client_secret=',facebook.client_secret,'&fb_exchange_token=',token]).join(''),
+      let url = `${facebook.oauth_access}?grant_type=fb_exchange_token&client_id=${facebook.client_id}&client_secret=${facebook.client_secret}&fb_exchange_token=${token}`,
           opt = {
             method: 'get'
           };
@@ -45,7 +42,7 @@ export default {
       return fetch(url, opt);
     },
     profile: function (access) {
-      let url = ([facebook.oauth_profile,'?fields=id,name,email,about,age_range,picture&access_token=',access]).join(''),
+      let url = `${facebook.oauth_profile}?fields=id,name,email,about,age_range,picture&access_token=${access}`,
           opt = {
             method: 'get'
           };
@@ -53,7 +50,7 @@ export default {
       return fetch(url, opt);
     },
     logout: function (access) {
-      let url = ([facebook.oauth_logout,'?next=',facebook.redirect_uri,'&access_token=',access]).join(''),
+      let url = `${facebook.oauth_logout}?next=${facebook.redirect_uri}&access_token=${access}`,
           opt = {
             method: 'get'
           };
@@ -63,7 +60,7 @@ export default {
   },
   google: {
     token: function (code) {
-      let url = ([google.oauth_token,'?grant_type=authorization_code&client_id=',google.client_id,'&client_secret=',google.client_secret,'&redirect_uri=',google.redirect_uri,'&code=',code]).join(''),
+      let url = `${google.oauth_token}?grant_type=authorization_code&client_id=${google.client_id}&client_secret=${google.client_secret}&redirect_uri=${google.redirect_uri}&code=${code}`,
           opt = {
             method: 'post',
             headers: {
@@ -74,7 +71,7 @@ export default {
       return fetch(url, opt);
     },
     profile: function (token) {
-      let url = ([google.oauth_profile,'?alt=json&access_token=',token]).join(''),
+      let url = `${google.oauth_profile}?alt=json&access_token=${token}`,
           opt = {
             method: 'get'
           };
@@ -82,7 +79,7 @@ export default {
       return fetch(url, opt);
     },
     logout: function (token) {
-      let url = ([google.oauth_logout,'?token=',token]).join(''),
+      let url = `${google.oauth_logout}?token=${token}`,
           opt = {
             method: 'get'
           };

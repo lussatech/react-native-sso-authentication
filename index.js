@@ -15,27 +15,11 @@ import ToolbarAndroid from 'ToolbarAndroid';
 
 import Facebook from './Facebook';
 import Google from './Google';
+import Navbar from './Navbar';
 import Server, {key as Key, facebook as OAuthFacebook, google as OAuthGoogle} from './Server';
+import Style from './Style';
 
-export {Facebook, Google, Server, Key, OAuthFacebook, OAuthGoogle};
-
-class Navbar extends Component {
-  constructor(props) {
-    super(props);
-  }
-
-  render() {
-    return (
-      <View style={styles.toolbarContainer} {...this.props}>
-        <ToolbarAndroid style={styles.toolbar}>
-          <View style={styles.titleContainer}>
-            <Text style={styles.title}>{this.props.title}</Text>
-          </View>
-        </ToolbarAndroid>
-      </View>
-    );
-  }
-}
+export {Facebook, Google, Server, Key, OAuthFacebook, OAuthGoogle, Style};
 
 export default class extends Component {
   constructor(props) {
@@ -50,9 +34,9 @@ export default class extends Component {
     return (
       <View style={{flex:1,flexDirection:'column'}}>
         <View>
-          <Navbar title={'Single Sign On'} />
+          <Navbar title={`Single Sign On`} onRefresh={() => this.setState({scene: undefined})} />
         </View>
-        <View style={{flex:1,margin:10}}>
+        <View style={{flex:1}}>
           {this.state.scene === 'facebook' ? this.renderFacebook() : this.state.scene === 'google' ? this.renderGoogle() : this.renderScene()}
         </View>
       </View>
@@ -62,11 +46,17 @@ export default class extends Component {
   renderScene() {
     return (
       <View>
-        <TouchableHighlight style={[styles.button, styles.buttonFacebook]} underlayColor={'#4163a8'} onPress={() => this.setState({scene: 'facebook'})}>
-          <Text style={styles.buttonText}>{'Sign In with Facebook'}</Text>
+        <TouchableHighlight
+          style={[styles.button, styles.buttonFacebook]}
+          underlayColor={'#4163a8'}
+          onPress={() => this.setState({scene: 'facebook'})}>
+          <Text style={styles.buttonText}>{`Sign In with Facebook`}</Text>
         </TouchableHighlight>
-        <TouchableHighlight style={[styles.button, styles.buttonGoogle]} underlayColor={'#fc473a'} onPress={() => this.setState({scene: 'google'})}>
-          <Text style={styles.buttonText}>{'Sign In with Google'}</Text>
+        <TouchableHighlight
+          style={[styles.button, styles.buttonGoogle]}
+          underlayColor={'#fc473a'}
+          onPress={() => this.setState({scene: 'google'})}>
+          <Text style={styles.buttonText}>{`Sign In with Google`}</Text>
         </TouchableHighlight>
       </View>
     );

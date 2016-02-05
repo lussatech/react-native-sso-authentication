@@ -16,7 +16,7 @@ export default {
   },
   button: {
     padding: 15,
-    marginTop: 20,
+    margin: 20,
     justifyContent: 'center',
     alignSelf: 'stretch'
   },
