@@ -1,3 +1,5 @@
+![react-native-sso-authentication](https://raw.githubusercontent.com/lussatech/react-native-sso-authentication/master/preview.gif)
+
 ### Installation
     npm i react-native-sso-authentication
 
